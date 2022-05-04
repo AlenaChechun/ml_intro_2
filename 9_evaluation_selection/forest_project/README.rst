@@ -20,7 +20,13 @@ This package allows you to train model.
 poetry install --no-dev
 ```
 
-5. Run train with the following command:
+5. Run *Pandas Profiling* with the following command:
+
+```
+poetry run pandas -d <path to csv with data> -out <path to save pandas profiling report in html>
+```
+
+6. Run train with the following command:
 
 ```
 poetry run train -d <path to csv with data> -s <path to save trained model>

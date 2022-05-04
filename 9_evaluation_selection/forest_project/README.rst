@@ -16,27 +16,27 @@ This package allows you to train model.
 
 4. Install the project dependencies (*run this and following commands in a terminal, from the root of a cloned repository*):
 
-``
+```
 poetry install --no-dev
-``
+```
 
 5. Run train with the following command:
 
-``
+```
 poetry run train -d <path to csv with data> -s <path to save trained model>
-``
+```
 
 You can configure additional options (such as hyperparameters) in the CLI. To get a full list of them, use help:
 
-``
+```
 poetry run train --help
-``
+```
 
 6. Run MLflow UI to see the information about experiments you conducted:
 
-``
+```
 poetry run mlflow ui
-``
+```
 
 Development
 -----------
@@ -45,12 +45,12 @@ The code in this repository must be tested, formatted with black, and pass mypy 
 
 * Install all requirements (including dev requirements) to poetry environment:
 
-``
+```
 poetry install
-``
+```
 
 * Now you can use developer instruments, e.g. pytest:
 
-``
+```
 poetry run pytest
-``
+```

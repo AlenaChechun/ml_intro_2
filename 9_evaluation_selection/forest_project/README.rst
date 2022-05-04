@@ -1,16 +1,18 @@
 Homework for RS School Machine Learning course.
+===============================================
 
-This demo uses [Forest Cover Type Prediction](https://www.kaggle.com/competitions/forest-cover-type-prediction) dataset.
+This demo uses [**Forest Cover Type Prediction**](https://www.kaggle.com/competitions/forest-cover-type-prediction) dataset.
 
-## Usage
+Usage
+-----
 This package allows you to train model for detecting the presence of .
 1. Clone this repository to your machine.
 2. Download [Forest Cover Type Prediction](https://www.kaggle.com/competitions/forest-cover-type-prediction) dataset, save csv locally (default path is *data/train.csv* in repository's root).
 3. Make sure Python 3.9 and [Poetry](https://python-poetry.org/docs/) are installed on your machine (I use Poetry 1.1.11).
 4. Install the project dependencies (*run this and following commands in a terminal, from the root of a cloned repository*):
-```sh
+*
 poetry install --no-dev
-```
+*
 5. Run train with the following command:
 ```sh
 poetry run train -d <path to csv with data> -s <path to save trained model>
@@ -24,7 +26,8 @@ poetry run train --help
 poetry run mlflow ui
 ```
 
-## Development
+Development
+-----------
 
 The code in this repository must be tested, formatted with black, and pass mypy typechecking before being commited to the repository.
 

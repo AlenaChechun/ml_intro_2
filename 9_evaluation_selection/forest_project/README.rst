@@ -44,6 +44,7 @@ poetry run train --help
 poetry run mlflow ui
 ```
 
+
 Development
 -----------
 
@@ -59,4 +60,18 @@ poetry install
 
 ```
 poetry run pytest
+```
+
+* Run the pre-commit hooks that triggers mypy cheching for all files.
+
+```
+pre-commit --pre-commit run --all-files
+```
+
+Note that the pre-commit works only when the git repository was cloned and switched into '2022' branch.
+```
+git clone git@github.com:AlenaChechun/ml_intro_2.git
+```
+```
+git checkout 2022
 ```

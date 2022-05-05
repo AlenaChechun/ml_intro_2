@@ -75,13 +75,13 @@ def train(
     logreg_c: float,
 ) -> None:
     cfg = config()
-    cfg.read_config(config_path)  
+    cfg.read_config(config_path)
     dataset = get_dataframe(dataset_path)
-    
+
     dataset = preprocess(
-        dataset, 
+        dataset,
         cfg.get_drop_features()
-    )        
+    )
     X_train, X_test, y_train, y_test = split_dataset(
         dataset,
         random_state,

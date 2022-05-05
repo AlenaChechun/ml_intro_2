@@ -16,6 +16,8 @@ pandas-profiling = "^3.2.0"
 sklearn = "^0.0"
 pathlib = "^1.0.1"
 configparser = "^5.2.0"
+mypy = "^0.950"
+pre-commit = "^2.19.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

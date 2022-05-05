@@ -25,7 +25,7 @@ from .pandas_profiling import run_pandas
 @click.option(
     "-out",
     "--output-path",
-    default="output.html",
+    default="pandas_profiling.html",
     #type=click.Path(exists=True, dir_okay=False, path_type=Path),
     show_default=True,
 )

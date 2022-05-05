@@ -38,7 +38,7 @@ You can configure additional options (such as hyperparameters) in the CLI. To ge
 poetry run train --help
 ```
 
-6. Run MLflow UI to see the information about experiments you conducted:
+7. Run MLflow UI to see the information about experiments you conducted:
 
 ```
 poetry run mlflow ui

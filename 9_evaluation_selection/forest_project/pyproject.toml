@@ -6,6 +6,7 @@ authors = ["Alena Chechun <achechun@gmail.com>"]
 
 [tool.poetry.scripts]
 pandas = "forest_project.pandas:pandas"
+train = "forest_project.train:train"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -14,6 +15,7 @@ mlflow = "^1.25.1"
 pandas-profiling = "^3.2.0"
 sklearn = "^0.0"
 pathlib = "^1.0.1"
+configparser = "^5.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

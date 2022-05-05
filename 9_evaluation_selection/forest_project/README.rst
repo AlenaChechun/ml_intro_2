@@ -69,9 +69,11 @@ pre-commit --pre-commit run --all-files
 ```
 
 Note that the pre-commit works only when the git repository was cloned and switched into '2022' branch.
+
 ```
 git clone git@github.com:AlenaChechun/ml_intro_2.git
 ```
+
 ```
 git checkout 2022
 ```

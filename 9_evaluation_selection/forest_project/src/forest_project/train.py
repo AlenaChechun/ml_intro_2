@@ -23,14 +23,14 @@ from .preprocess_data import preprocess
     "-d",
     "--dataset-path",
     default="data/train.csv",
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    type=click.Path(exists=True, dir_okay=False),
     show_default=True,
 )
 @click.option(
     "-c",
     "--config-path",
     default="config.ini",
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    type=click.Path(exists=True, dir_okay=False),
     show_default=True,
 )
 @click.option(
@@ -42,7 +42,7 @@ from .preprocess_data import preprocess
 @click.option(
     "--test-split-ratio",
     default=0.2,
-    type=click.FloatRange(0, 1, min_open=True, max_open=True),
+    type=click.FloatRange(0, 1),
     show_default=True,
 )
 @click.option(

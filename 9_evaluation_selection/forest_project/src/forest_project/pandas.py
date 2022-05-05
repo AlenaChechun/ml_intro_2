@@ -17,15 +17,15 @@ from .pandas_profiling import run_pandas
 @click.option(
     "-d",
     "--dataset-path",
-    default="data/train.csv",
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    default=Path("data/train.csv"),
+    type=click.Path(exists=True, dir_okay=False),
     show_default=True,
 )
 
 @click.option(
     "-out",
     "--output-path",
-    default="pandas_profiling.html",
+    default=Path("pandas_profiling.html"),
     #type=click.Path(exists=True, dir_okay=False, path_type=Path),
     show_default=True,
 )

@@ -1,11 +1,11 @@
 # Materials
-Take a look into data quality related issues in real life: https://hbr.org/2018/04/if-your-data-is-bad-your-machine-learning-tools-are-useless.  
+Take a look into data quality related issues in real life: https://hbr.org/2018/04/if-your-data-is-bad-your-machine-learning-tools-are-useless.
 
-Study sections 12.1. Describing Single Variables and 12.2.2 Correlations Between Quantitative Variables from [Research Methods article](https://saylordotorg.github.io/text_research-methods-in-psychology/) (feel free to skip the Differences Between Groups or Conditions section).   
+Study sections 12.1. Describing Single Variables and 12.2.2 Correlations Between Quantitative Variables from [Research Methods article](https://saylordotorg.github.io/text_research-methods-in-psychology/) (feel free to skip the Differences Between Groups or Conditions section).
 
-Familiarize yourself with the seaborn library: https://seaborn.pydata.org/introduction.html.  
-Take this mini-course to get more hands-on: https://www.kaggle.com/learn/data-visualization. Don't miss the exercises!  
-Get acquainted with boxplots: https://towardsdatascience.com/understanding-boxplots-5e2df7bcbd51.  
+Familiarize yourself with the seaborn library: https://seaborn.pydata.org/introduction.html.
+Take this mini-course to get more hands-on: https://www.kaggle.com/learn/data-visualization. Don't miss the exercises!
+Get acquainted with boxplots: https://towardsdatascience.com/understanding-boxplots-5e2df7bcbd51.
 
 Install and experiment with the [pandas_profiling library](https://github.com/ydataai/pandas-profiling)
 
@@ -16,7 +16,7 @@ Perform a comprehensive exploration of this dataset: https://archive.ics.uci.edu
 Then apply pandas_profiling, check for new findings and fill the gaps in your earlier analysis.
 
 # Graded assignments
-Register on https://www.kaggle.com/.  
-Join this competition: https://www.kaggle.com/c/tabular-playground-series-apr-2021.   
-Get train.csv from https://www.kaggle.com/c/tabular-playground-series-apr-2021/data.  
+Register on https://www.kaggle.com/.
+Join this competition: https://www.kaggle.com/c/tabular-playground-series-apr-2021.
+Get train.csv from https://www.kaggle.com/c/tabular-playground-series-apr-2021/data.
 Perform data exploration and visualization without using the pandas_profiling library.

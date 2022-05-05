@@ -1,22 +1,22 @@
 # Evaluation-selection homework
 
-Welcome to the assignment of evaluation and selection module. This time we encourage you to implement an ML project from scratch with a structure close to production ML projects. To simplify things a little bit, you will implement only model training, evaluation, and selection steps. As a challenge, you can try to add deployment and inference steps later after finishing the RS course. 
+Welcome to the assignment of evaluation and selection module. This time we encourage you to implement an ML project from scratch with a structure close to production ML projects. To simplify things a little bit, you will implement only model training, evaluation, and selection steps. As a challenge, you can try to add deployment and inference steps later after finishing the RS course.
 
 ## How to solve it?
 
-Carefully read all the instructions before writing any code. Don't worry if it seems too complicated at first glance — it's meant to be. Decompose the big task into small and easy tasks and implement them one by one. We prepared a [demo solution](https://github.com/rolling-scopes-school/ml-project-demo) for another dataset that can help you while implementing yours. You don't have and shouldn't follow it entirely, but use it as a guide. For some tasks, you'll have to do things that are not implemented in the demo: that's an exercise for finding the necessary information on your own. 
+Carefully read all the instructions before writing any code. Don't worry if it seems too complicated at first glance — it's meant to be. Decompose the big task into small and easy tasks and implement them one by one. We prepared a [demo solution](https://github.com/rolling-scopes-school/ml-project-demo) for another dataset that can help you while implementing yours. You don't have and shouldn't follow it entirely, but use it as a guide. For some tasks, you'll have to do things that are not implemented in the demo: that's an exercise for finding the necessary information on your own.
 
 There are three kinds of tasks: necessary conditions, good to have, and optional. Everything that is not marked as optional or necessary is good to have. You'll need to pass the necessary conditions to get more than 0 points for this homework, but there are not so many of them. Concentrate on good to have tasks, do them as well as you can. Do optional tasks only if you have some time and energy left, and are confident that other tasks are implemented with great quality.
 
-If you're worried that someone may steal your work, start with a private Github repository. You'll need to make it public before submitting it for peer review, all your previous commits will become public after that. Submit a link to your public repository. Before submitting, check that everything is shown correctly to other people by opening the link you provide in a private window.  
+If you're worried that someone may steal your work, start with a private Github repository. You'll need to make it public before submitting it for peer review, all your previous commits will become public after that. Submit a link to your public repository. Before submitting, check that everything is shown correctly to other people by opening the link you provide in a private window.
 
 ## How to review it?
 
-If you're reviewing someone else's homework, you should receive a link to a public Github repository with this person's solution. Calculate points as stated in bold font after most of the tasks in the statement. If you see that some tasks are done not fully, you can count a partial number of points for these tasks. If there is nothing specified in bold font, it means either that there are no points for this task or it's comprised fully of sub-tasks and doesn't have value on its own. To calculate the total result, sum up points from all tasks that have points. 
+If you're reviewing someone else's homework, you should receive a link to a public Github repository with this person's solution. Calculate points as stated in bold font after most of the tasks in the statement. If you see that some tasks are done not fully, you can count a partial number of points for these tasks. If there is nothing specified in bold font, it means either that there are no points for this task or it's comprised fully of sub-tasks and doesn't have value on its own. To calculate the total result, sum up points from all tasks that have points.
 
 The maximum number of points for this HW is 100, 22 of them are for optional tasks.
 
-Please, leave feedback for each task: don't just write the total number of points a student received.  
+Please, leave feedback for each task: don't just write the total number of points a student received.
 
 You can use [this spreadsheet](https://docs.google.com/spreadsheets/d/14QBY9aSRnKsx2mTYm-5OFBIV_NBg0Xh-QbcO6U3QlpY/edit?usp=sharing) as a template for your review. Make a copy of it and fill it out during the review: you'll see a total amount of points at the bottom. Send a final version to the person you were reviewing.
 
@@ -34,13 +34,13 @@ You can use [this spreadsheet](https://docs.google.com/spreadsheets/d/14QBY9aSRn
 6. Write a script that trains a model and saves it to a file. Your script should be runnable from the terminal, receive some arguments such as the path to data, model configurations, etc. To create CLI, you can use argparse, click (as in the demo), hydra, or some other alternatives. **(10 points)**
     1. (optional) Register your script in pyproject.toml. This way you can run it without specifying a full path to a script file. **(2 points)**
 7. Choose some metrics to validate your model (at least 3) and calculate them after training. Use K-fold cross-validation. **(10 points maximum: 2 per metric + 4 for K-fold. *Note for reviewers: K-fold CV may be overwritten by nested CV if the 9th task is implemented, check the history of commits in this case. If more than 3 metrics were chosen, only 3 are graded*)**
-8. Conduct experiments with your model. Track each experiment into MLFlow. Make a screenshot of the results in the MLFlow UI and include it in README. You can see the screenshot example below, but in your case, it may be more complex than that. Choose the best configuration with respect to a single metric (most important of all metrics you calculate, according to your opinion). 
+8. Conduct experiments with your model. Track each experiment into MLFlow. Make a screenshot of the results in the MLFlow UI and include it in README. You can see the screenshot example below, but in your case, it may be more complex than that. Choose the best configuration with respect to a single metric (most important of all metrics you calculate, according to your opinion).
     1. Try at least three different sets of hyperparameters for each model. **(3 points)**
     2. Try at least two different feature engineering techniques for each model. **(4 points)**
     3. Try at least two different ML models. **(4 points)**
-    
+
     ![MLFlow experiments example](https://user-images.githubusercontent.com/40484210/147333877-8acc8c51-00f6-4278-bf76-05abf51301ab.png)
-    
+
 9. Instead of tuning hyperparameters manually, use automatic hyperparameter search for each model (choose a single metric again). Estimate quality with nested cross-validation, e.g. as described [here](https://machinelearningmastery.com/nested-cross-validation-for-machine-learning-with-python/). Although you used a single metric for model selection, the quality should be measured with all the metrics you chose in task 7. **(10 points)**
 10. In your README, write instructions on how to run your code (training script and optionally other scripts you created, such as EDA). If someone who cloned your repository correctly follows the steps you describe, the script should work for them and produce the same results as it produced on your PC (so don't forget about specifying random seeds). The instructions should be as unambiguous and easy to follow as possible. **(10 points)**
     1. (optional) If you do the optional tasks below, add a development guide to README. You should specify what other developers should do to continue working on your code: what dependencies they should install, how they should run tests, formatting, etc. **(2 points)**

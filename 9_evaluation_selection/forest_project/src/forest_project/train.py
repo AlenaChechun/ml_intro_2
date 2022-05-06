@@ -76,6 +76,12 @@ from .preprocess_data import preprocess
     show_default=True,
 )
 @click.option(
+    "--model",
+    default='RFOREST',
+    type=click.Choice(['LOGISTIC', 'RFOREST'], case_sensitive=False),
+    show_default=True,
+)
+@click.option(
     "--max-iter",
     default=1000,
     type=int,
@@ -87,6 +93,19 @@ from .preprocess_data import preprocess
     type=float,
     show_default=True,
 )
+@click.option(
+    "--n-estimators",
+    default=100,
+    type=int,
+    show_default=True,
+)
+@click.option(
+    "--max-depth",
+    default=None,
+    type=int,
+    show_default=True,
+    help='[default: None]'
+)
 
 
 def train(
@@ -95,12 +114,11 @@ def train(
     random_state: int,
     test_split_ratio: float,
     use_scaler: bool,
-    use_variance: bool,
-    variance: int,
-    use_kbest: bool,
-    k_best: int,
-    max_iter: int,
-    logreg_c: float,
+    use_variance: bool, variance: int,
+    use_kbest: bool, k_best: int,
+    model,
+    max_iter: int, logreg_c: float,    # params for logistic regression
+    n_estimators:int, max_depth: int   # params for random forest
 ) -> None:
     cfg = config()
     cfg.read_config(config_path)
@@ -115,12 +133,21 @@ def train(
         random_state,
         test_split_ratio,
     )
+    if model == 'LOGISTIC':
+        use_logreg = True
+        use_rforest = False
+    elif model == 'RFOREST':
+        use_logreg = False
+        use_rforest = True
+
     with mlflow.start_run():
         pipeline = create_pipeline(
+            random_state,
             use_scaler,
             use_variance, variance,
             use_kbest, k_best,
-            max_iter, logreg_c, random_state
+            use_logreg, max_iter, logreg_c,
+            use_rforest, n_estimators, max_depth
         )
         pipeline.fit(X_train, y_train)
         accuracy = accuracy_score(y_test, pipeline.predict(X_test))

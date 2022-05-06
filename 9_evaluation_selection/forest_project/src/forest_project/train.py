@@ -11,7 +11,7 @@ from joblib import dump
 import click
 import mlflow
 import mlflow.sklearn
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 
 from .data import split_dataset, get_dataframe
 from .config import Config as config
@@ -150,7 +150,10 @@ def train(
             use_rforest, n_estimators, max_depth
         )
         pipeline.fit(X_train, y_train)
-        accuracy = accuracy_score(y_test, pipeline.predict(X_test))
+        y_pred = pipeline.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        f1_w = f1_score(y_test, y_pred, average='weighted')
+        f1_m = f1_score(y_test, y_pred, average='micro')
         mlflow.log_param("random_state", random_state)
         mlflow.log_param("use_scaler", use_scaler)
         mlflow.log_param("use_variance", use_variance)
@@ -162,7 +165,11 @@ def train(
         mlflow.log_param("max_iter", max_iter)
         mlflow.log_param("logreg_c", logreg_c)
         mlflow.log_metric("accuracy", accuracy)
+        mlflow.log_metric("f1 weighted", f1_w)
+        mlflow.log_metric("f1 micro", f1_m)
         click.echo(f"Accuracy: {accuracy}.")
+        click.echo(f"f1 weighted: {f1_w}.")
+        click.echo(f"f1 micro: {f1_m}.")
         #dump(pipeline, save_model_path)
         #click.echo(f"Model is saved to {save_model_path}.")
         mlflow.end_run()

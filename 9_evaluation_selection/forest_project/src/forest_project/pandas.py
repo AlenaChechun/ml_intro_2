@@ -40,4 +40,5 @@ def pandas(
         run_pandas(df, output_path)
         mlflow.log_param("dataset_path", dataset_path)
         mlflow.log_param("output_path", output_path)
+        mlflow.log_model('pandas_profiling')
         mlflow.end_run()

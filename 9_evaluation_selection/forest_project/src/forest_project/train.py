@@ -52,8 +52,32 @@ from .preprocess_data import preprocess
     show_default=True,
 )
 @click.option(
+    "--use-variance",
+    default=False,
+    type=bool,
+    show_default=True,
+)
+@click.option(
+    "--variance",
+    default=0.8,
+    type=click.FloatRange(0, 1),
+    show_default=True,
+)
+@click.option(
+    "--use-kbest",
+    default=False,
+    type=bool,
+    show_default=True,
+)
+@click.option(
+    "--k-best",
+    default=30,
+    type=int,
+    show_default=True,
+)
+@click.option(
     "--max-iter",
-    default=100,
+    default=1000,
     type=int,
     show_default=True,
 )
@@ -71,6 +95,10 @@ def train(
     random_state: int,
     test_split_ratio: float,
     use_scaler: bool,
+    use_variance: bool,
+    variance: int,
+    use_kbest: bool,
+    k_best: int,
     max_iter: int,
     logreg_c: float,
 ) -> None:
@@ -88,10 +116,22 @@ def train(
         test_split_ratio,
     )
     with mlflow.start_run():
-        pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
+        pipeline = create_pipeline(
+            use_scaler,
+            use_variance, variance,
+            use_kbest, k_best,
+            max_iter, logreg_c, random_state
+        )
         pipeline.fit(X_train, y_train)
         accuracy = accuracy_score(y_test, pipeline.predict(X_test))
+        mlflow.log_param("random_state", random_state)
         mlflow.log_param("use_scaler", use_scaler)
+        mlflow.log_param("use_variance", use_variance)
+        if use_variance:
+            mlflow.log_param("variance", variance)
+        mlflow.log_param("use_kbest", use_kbest)
+        if use_kbest:
+            mlflow.log_param("k_best", k_best)
         mlflow.log_param("max_iter", max_iter)
         mlflow.log_param("logreg_c", logreg_c)
         mlflow.log_metric("accuracy", accuracy)

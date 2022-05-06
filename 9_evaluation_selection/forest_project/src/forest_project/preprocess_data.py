@@ -5,6 +5,7 @@ Created on Thu May  5 01:24:58 2022
 @author: alena.chechun
 """
 import pandas as pd
+import click
 
 
 def preprocess(df : pd.DataFrame, drop_columns):
@@ -13,6 +14,6 @@ def preprocess(df : pd.DataFrame, drop_columns):
     return df
 
 def drop_column(df : pd.DataFrame, column_name : str):
-    print(f'Dtop the feature {column_name}.')
+    click.echo(f'Dtop the feature {column_name}.')
     df = df.drop(column_name, axis='columns')
     return df

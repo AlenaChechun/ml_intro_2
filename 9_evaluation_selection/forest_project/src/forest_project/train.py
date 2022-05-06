@@ -11,7 +11,7 @@ from joblib import dump
 import click
 import mlflow
 import mlflow.sklearn
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
 from .data import split_dataset, get_dataframe
 from .config import Config as config
@@ -154,6 +154,7 @@ def train(
         accuracy = accuracy_score(y_test, y_pred)
         f1_w = f1_score(y_test, y_pred, average='weighted')
         f1_m = f1_score(y_test, y_pred, average='micro')
+        roc_ovr = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr')
         mlflow.log_param("random_state", random_state)
         mlflow.log_param("use_scaler", use_scaler)
         mlflow.log_param("use_variance", use_variance)
@@ -167,9 +168,12 @@ def train(
         mlflow.log_metric("accuracy", accuracy)
         mlflow.log_metric("f1 weighted", f1_w)
         mlflow.log_metric("f1 micro", f1_m)
+        mlflow.log_metric("roc_ovr", roc_ovr)
+
         click.echo(f"Accuracy: {accuracy}.")
         click.echo(f"f1 weighted: {f1_w}.")
         click.echo(f"f1 micro: {f1_m}.")
+        click.echo(f"ROC ovr: {roc_ovr}.")
         #dump(pipeline, save_model_path)
         #click.echo(f"Model is saved to {save_model_path}.")
         mlflow.end_run()

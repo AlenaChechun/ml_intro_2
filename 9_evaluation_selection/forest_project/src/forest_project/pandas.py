@@ -11,7 +11,7 @@ import mlflow
 import mlflow.sklearn
 
 from .data import get_dataframe
-from .pandas_profiling import run_pandas
+from .pandas_profile import run_pandas
 
 @click.command()
 @click.option(

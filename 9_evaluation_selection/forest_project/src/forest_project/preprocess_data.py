@@ -8,12 +8,16 @@ import pandas as pd
 import click
 
 
-def preprocess(df : pd.DataFrame, drop_columns):
+def preprocess(df: pd.DataFrame,
+               drop_columns: list,
+) -> pd.DataFrame:
     for column in drop_columns:
         df = drop_column(df, column)
     return df
 
-def drop_column(df : pd.DataFrame, column_name : str):
+def drop_column(df: pd.DataFrame,
+                column_name: str,
+ ) -> pd.DataFrame:
     click.echo(f'Dtop the feature {column_name}.')
     df = df.drop(column_name, axis='columns')
     return df

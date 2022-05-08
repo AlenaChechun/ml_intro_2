@@ -11,12 +11,14 @@ from joblib import dump
 import click
 import mlflow
 import mlflow.sklearn
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
-from .data import split_dataset, get_dataframe
+from .data import split_dataset, get_dataframe, get_features, get_target
 from .config import Config as config
 from .pipeline import create_pipeline
 from .preprocess_data import preprocess
+from .cv import kfolder
+from .score import get_score
+
 
 @click.command()
 @click.option(
@@ -31,6 +33,13 @@ from .preprocess_data import preprocess
     "--config-path",
     default="config.ini",
     type=click.Path(exists=True, dir_okay=False),
+    show_default=True,
+)
+@click.option(
+    "-c",
+    "--save-model-path",
+    default="data/model.joblib",
+    type=click.Path(dir_okay=False, writable=True),
     show_default=True,
 )
 @click.option(
@@ -106,11 +115,23 @@ from .preprocess_data import preprocess
     show_default=True,
     help='[default: None]'
 )
+@click.option(
+    "--cv-kfolder",
+    default=True,
+    show_default=True,
+)
+@click.option(
+    "--n-splits",
+    default=5,
+    type=int,
+    show_default=True,
+)
 
 
 def train(
     dataset_path: Path,
     config_path: Path,
+    save_model_path: Path,
     random_state: int,
     test_split_ratio: float,
     use_scaler: bool,
@@ -118,21 +139,19 @@ def train(
     use_kbest: bool, k_best: int,
     model,
     max_iter: int, logreg_c: float,    # params for logistic regression
-    n_estimators:int, max_depth: int   # params for random forest
+    n_estimators:int, max_depth: int,  # params for random
+    cv_kfolder: bool, n_splits: int,
 ) -> None:
     cfg = config()
     cfg.read_config(config_path)
+    scorings = ['accuracy', 'f1_weighted', 'roc_auc_ovr']   # https://scikit-learn.org/stable/modules/model_evaluation.html
     dataset = get_dataframe(dataset_path)
 
     dataset = preprocess(
         dataset,
         cfg.get_drop_features()
     )
-    X_train, X_test, y_train, y_test = split_dataset(
-        dataset,
-        random_state,
-        test_split_ratio,
-    )
+
     if model == 'LOGISTIC':
         use_logreg = True
         use_rforest = False
@@ -149,12 +168,33 @@ def train(
             use_logreg, max_iter, logreg_c,
             use_rforest, n_estimators, max_depth
         )
-        pipeline.fit(X_train, y_train)
-        y_pred = pipeline.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        f1_w = f1_score(y_test, y_pred, average='weighted')
-        f1_m = f1_score(y_test, y_pred, average='micro')
-        roc_ovr = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr')
+
+        if cv_kfolder:
+            score_mean, score_std = kfolder(
+                pipeline,
+                get_features(dataset),
+                get_target(dataset),
+                n_splits,
+                random_state,
+                scorings
+            )
+        else:
+            X_train, X_test, y_train, y_test = split_dataset(
+                dataset,
+                random_state,
+                test_split_ratio,
+            )
+            pipeline.fit(X_train, y_train)
+            y_pred = pipeline.predict(X_test)
+
+            score_mean = []
+            score_std = []
+            for name_score in scorings:
+                score_mean.append(get_score(name_score, X_test, y_test, y_pred, pipeline))
+                score_std.append(0)
+
+
+        mlflow.sklearn.log_model(pipeline, model)       # dump pickle module
         mlflow.log_param("random_state", random_state)
         mlflow.log_param("use_scaler", use_scaler)
         mlflow.log_param("use_variance", use_variance)
@@ -165,15 +205,13 @@ def train(
             mlflow.log_param("k_best", k_best)
         mlflow.log_param("max_iter", max_iter)
         mlflow.log_param("logreg_c", logreg_c)
-        mlflow.log_metric("accuracy", accuracy)
-        mlflow.log_metric("f1 weighted", f1_w)
-        mlflow.log_metric("f1 micro", f1_m)
-        mlflow.log_metric("roc_ovr", roc_ovr)
+        mlflow.log_param("output_path", save_model_path)
 
-        click.echo(f"Accuracy: {accuracy}.")
-        click.echo(f"f1 weighted: {f1_w}.")
-        click.echo(f"f1 micro: {f1_m}.")
-        click.echo(f"ROC ovr: {roc_ovr}.")
-        #dump(pipeline, save_model_path)
-        #click.echo(f"Model is saved to {save_model_path}.")
+        for name_score, idx in zip(scorings, range(len(scorings))):
+            mlflow.log_metric(name_score, score_mean[idx])
+            mlflow.log_metric(name_score + 'std', score_std[idx])
+            click.echo(f"{name_score}: {score_mean[idx]} +/- {score_std[idx]}.")
+
+        dump(pipeline, save_model_path)
+        click.echo(f"Model is saved to {save_model_path}.")
         mlflow.end_run()

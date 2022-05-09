@@ -6,10 +6,11 @@ Created on Thu May  5 01:24:58 2022
 """
 import pandas as pd
 import click
+from typing import List
 
 
 def preprocess(df: pd.DataFrame,
-               drop_columns: list,
+               drop_columns: List[str],
 ) -> pd.DataFrame:
     for column in drop_columns:
         df = drop_column(df, column)

@@ -11,10 +11,10 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 def get_score(score_name: str,   # https://scikit-learn.org/stable/modules/model_evaluation.html
               X_test: pd.DataFrame,
               y_test: pd.Series,
-              y_pred: pd.Series,
               pipeline: Pipeline,
 ) -> float:
     score = 0
+    y_pred = pipeline.predict(X_test)
     if score_name == 'accuracy':
         score = accuracy_score(y_test, y_pred)
     elif score_name == 'f1_weighted':

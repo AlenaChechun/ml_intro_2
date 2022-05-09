@@ -16,7 +16,7 @@ from .data import split_dataset, get_dataframe, get_features, get_target
 from .config import Config as config
 from .pipeline import create_pipeline
 from .preprocess_data import preprocess
-from .cv import kfolder
+from .cv import kfolder, nested
 from .score import get_score
 
 
@@ -118,6 +118,13 @@ from .score import get_score
 @click.option(
     "--cv-kfolder",
     default=True,
+    type=bool,
+    show_default=True,
+)
+@click.option(
+    "--cv-nested",
+    default=True,
+    type=bool,
     show_default=True,
 )
 @click.option(
@@ -137,10 +144,10 @@ def train(
     use_scaler: bool,
     use_variance: bool, variance: int,
     use_kbest: bool, k_best: int,
-    model,
+    model: str,
     max_iter: int, logreg_c: float,    # params for logistic regression
     n_estimators:int, max_depth: int,  # params for random
-    cv_kfolder: bool, n_splits: int,
+    cv_kfolder: bool, cv_nested: bool, n_splits: int,
 ) -> None:
     cfg = config()
     cfg.read_config(config_path)
@@ -155,9 +162,16 @@ def train(
     if model == 'LOGISTIC':
         use_logreg = True
         use_rforest = False
+        model_params = [{'cl__max_iter': [],
+                         'cl__C': [0.01, 0.01, 1, 10, 100]
+                        }]
     elif model == 'RFOREST':
         use_logreg = False
         use_rforest = True
+        model_params = [{'cl__n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+                         'cl__criterion': ['entropy', 'gini'],
+                         'cl__max_depth': list(range(10, 20))
+                         }]
 
     with mlflow.start_run():
         pipeline = create_pipeline(
@@ -169,7 +183,18 @@ def train(
             use_rforest, n_estimators, max_depth
         )
 
-        if cv_kfolder:
+        if cv_nested:
+            nested(
+                pipeline,
+                model_params,
+                get_features(dataset),
+                get_target(dataset),
+                n_splits,
+                random_state,
+                scorings
+            )
+
+        elif cv_kfolder:
             score_mean, score_std = kfolder(
                 pipeline,
                 get_features(dataset),
@@ -185,12 +210,11 @@ def train(
                 test_split_ratio,
             )
             pipeline.fit(X_train, y_train)
-            y_pred = pipeline.predict(X_test)
 
             score_mean = []
             score_std = []
             for name_score in scorings:
-                score_mean.append(get_score(name_score, X_test, y_test, y_pred, pipeline))
+                score_mean.append(get_score(name_score, X_test, y_test, pipeline))
                 score_std.append(0)
 
 

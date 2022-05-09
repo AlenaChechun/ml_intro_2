@@ -35,7 +35,7 @@ def create_pipeline(
     if use_logreg:
         pipeline_steps.append(
             (
-                "classifier",
+                "cl",
                 LogisticRegression(
                     random_state=random_state, max_iter=max_iter, C=logreg_C
                 ),
@@ -44,7 +44,7 @@ def create_pipeline(
     if use_rforest:
         pipeline_steps.append(
             (
-                "classifier",
+                "cl",
                 RandomForestClassifier(
                     n_estimators=n_estimators, max_depth=max_depth, random_state=random_state
                 ),

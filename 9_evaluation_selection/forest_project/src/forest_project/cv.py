@@ -4,6 +4,7 @@ Created on Sun May  8 21:26:00 2022
 
 @author: alena.chechun
 """
+import click
 import pandas as pd
 from typing import Tuple, List, Dict
 from sklearn.pipeline import Pipeline
@@ -45,7 +46,7 @@ def nested(model: Pipeline,
     for train_index, test_index in cv_out.split(X):
         X_train, X_test = X.iloc[train_index.tolist()], X.iloc[test_index.tolist()]
         y_train, y_test = y.iloc[train_index.tolist()], y.iloc[test_index.tolist()]
-        print(X_train.shape, X_test.shape)
+        click.echo(X_train.shape, X_test.shape)
         cv_inner = KFold(n_splits=(n_splits - 1), shuffle=True, random_state=random_state)
         cv = RandomizedSearchCV(model,
                           model_params,
@@ -63,13 +64,13 @@ def nested(model: Pipeline,
             best_score = cv.best_score_
             best_cv = cv
             best_params = cv.best_params_
-            print(f"nested-best_params_: {cv.best_params_}")
-            print(f"nested-train_score of {name_fit_core}: {cv.best_score_}")
+            click.echo(f"nested-best_params_: {cv.best_params_}")
+            click.echo(f"nested-train_score of {name_fit_core}: {cv.best_score_}")
 
     for name_score, idx in zip(name_scorings, range(len(name_scorings))):
         score = get_score(name_score, X_train, y_train, best_cv)
-        print(f"nested-train_score of {name_score}: {score}.")
+        click.echo(f"nested-train_score of {name_score}: {score}.")
         score = get_score(name_score, X_test, y_test, best_cv)
-        print(f"nested-test_score of {name_score}: {score}.")
+        click.echo(f"nested-test_score of {name_score}: {score}.")
 
     return best_cv, best_params

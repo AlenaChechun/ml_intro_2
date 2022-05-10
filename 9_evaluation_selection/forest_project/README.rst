@@ -75,7 +75,7 @@ poetry run pytest
 * Run mypy
 
 ```
- mypy .\src\forest_project\
+ mypy ``.\src\forest_project\``
 ``` 
 
 * Run the pre-commit hooks that triggers mypy cheching for all files.

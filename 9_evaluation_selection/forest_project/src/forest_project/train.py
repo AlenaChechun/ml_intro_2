@@ -4,13 +4,14 @@ Created on Wed May  5 12:45:01 2022
 
 @author: alena.chechun
 """
-
+from typing import List
 from pathlib import Path
 from joblib import dump
 
 import click
 import mlflow
 import mlflow.sklearn
+#import logging
 
 from .data import split_dataset, get_dataframe, get_features, get_target
 from .config import Config as config
@@ -18,6 +19,7 @@ from .pipeline import create_pipeline
 from .preprocess_data import preprocess
 from .cv import kfolder, nested
 from .score import get_score
+from .model import Model, MODEL_LOGISTIC, MODEL_RFOREST
 
 
 @click.command()
@@ -86,8 +88,8 @@ from .score import get_score
 )
 @click.option(
     "--model",
-    default='RFOREST',
-    type=click.Choice(['LOGISTIC', 'RFOREST'], case_sensitive=False),
+    default=MODEL_LOGISTIC,
+    type=click.Choice([MODEL_LOGISTIC, MODEL_RFOREST], case_sensitive=False),
     show_default=True,
 )
 @click.option(
@@ -123,7 +125,7 @@ from .score import get_score
 )
 @click.option(
     "--cv-nested",
-    default=True,
+    default=False,
     type=bool,
     show_default=True,
 )
@@ -151,7 +153,7 @@ def train(
 ) -> None:
     cfg = config()
     cfg.read_config(config_path)
-    scorings = ['accuracy', 'f1_weighted', 'roc_auc_ovr']   # https://scikit-learn.org/stable/modules/model_evaluation.html
+    scorings = ['accuracy', 'f1_weighted', 'roc_auc_ovr']   # todo: setup config, note: https://scikit-learn.org/stable/modules/model_evaluation.html
     dataset = get_dataframe(dataset_path)
 
     dataset = preprocess(
@@ -159,40 +161,38 @@ def train(
         cfg.get_drop_features()
     )
 
-    if model == 'LOGISTIC':
-        use_logreg = True
-        use_rforest = False
-        model_params = [{'cl__max_iter': [],
-                         'cl__C': [0.01, 0.01, 1, 10, 100]
-                        }]
-    elif model == 'RFOREST':
-        use_logreg = False
-        use_rforest = True
-        model_params = [{'cl__n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                         'cl__criterion': ['entropy', 'gini'],
-                         'cl__max_depth': list(range(10, 20))
-                         }]
+    model_obj = Model(name=model,
+                      random_state=random_state,
+                      max_iter=max_iter, C=logreg_c,
+                      n_estimators=n_estimators, max_depth=max_depth,
+                      )
 
     with mlflow.start_run():
+        score_mean: List[float] = []
+        score_std: List[float]  = []
+
         pipeline = create_pipeline(
+            model_obj.get_model(),
             random_state,
             use_scaler,
             use_variance, variance,
             use_kbest, k_best,
-            use_logreg, max_iter, logreg_c,
-            use_rforest, n_estimators, max_depth
         )
 
+
         if cv_nested:
-            nested(
+            pipeline, best_params = nested(
                 pipeline,
-                model_params,
+                model_obj.get_cv_params(),
                 get_features(dataset),
                 get_target(dataset),
                 n_splits,
                 random_state,
-                scorings
+                scorings,
+                'accuracy',   #todo: setup config
             )
+
+            model_obj.set_params(best_params)
 
         elif cv_kfolder:
             score_mean, score_std = kfolder(
@@ -211,12 +211,14 @@ def train(
             )
             pipeline.fit(X_train, y_train)
 
-            score_mean = []
-            score_std = []
+        # update scores
+        if len(score_mean) == 0:
             for name_score in scorings:
                 score_mean.append(get_score(name_score, X_test, y_test, pipeline))
                 score_std.append(0)
 
+
+        model_obj.mlflow_log_param(mlflow)
 
         mlflow.sklearn.log_model(pipeline, model)       # dump pickle module
         mlflow.log_param("random_state", random_state)
@@ -227,9 +229,6 @@ def train(
         mlflow.log_param("use_kbest", use_kbest)
         if use_kbest:
             mlflow.log_param("k_best", k_best)
-        mlflow.log_param("max_iter", max_iter)
-        mlflow.log_param("logreg_c", logreg_c)
-        mlflow.log_param("output_path", save_model_path)
 
         for name_score, idx in zip(scorings, range(len(scorings))):
             mlflow.log_metric(name_score, score_mean[idx])

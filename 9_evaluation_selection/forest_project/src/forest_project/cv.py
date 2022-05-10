@@ -7,7 +7,7 @@ Created on Sun May  8 21:26:00 2022
 import pandas as pd
 from typing import Tuple, List, Dict
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import KFold, GridSearchCV, cross_val_score
+from sklearn.model_selection import KFold, RandomizedSearchCV, cross_val_score
 
 from .score import get_score
 
@@ -36,27 +36,40 @@ def nested(model: Pipeline,
            n_splits: int,
            random_state: int,
            name_scorings: List[str],
-) -> None:
+           name_fit_core: str,
+) -> Tuple[object, Dict[str, object]]:
     cv_out = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
+    best_score = 0
+    best_cv = None
     for train_index, test_index in cv_out.split(X):
         X_train, X_test = X.iloc[train_index.tolist()], X.iloc[test_index.tolist()]
         y_train, y_test = y.iloc[train_index.tolist()], y.iloc[test_index.tolist()]
         print(X_train.shape, X_test.shape)
         cv_inner = KFold(n_splits=(n_splits - 1), shuffle=True, random_state=random_state)
-        cv = GridSearchCV(model,
+        cv = RandomizedSearchCV(model,
                           model_params,
                           scoring=name_scorings,
                           return_train_score=True,
                           cv=cv_inner,
-                          refit=False,
+                          refit=name_fit_core,
+                          n_jobs=-1,
                           )
-        result = cv.fit(X_train, y_train)
-        best_model = result.best_estimator_
-        print(result.best_params_)
-        #print(best_model)
-        print(f"nested-train_score: {result.best_score_}")
+        cv = cv.fit(X_train, y_train)
+        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_multi_metric_evaluation.html#sphx-glr-auto-examples-model-selection-plot-multi-metric-evaluation-py
+        # print(cv.cv_results_)
 
-        for name_score, idx in zip(name_scorings, range(len(name_scorings))):
-            score = get_score(name_score, X_test, y_test, best_model)
-            print(f"nested-test_score: {score}.")
+        if cv.best_score_ > best_score:
+            best_score = cv.best_score_
+            best_cv = cv
+            best_params = cv.best_params_
+            print(f"nested-best_params_: {cv.best_params_}")
+            print(f"nested-train_score of {name_fit_core}: {cv.best_score_}")
+
+    for name_score, idx in zip(name_scorings, range(len(name_scorings))):
+        score = get_score(name_score, X_train, y_train, best_cv)
+        print(f"nested-train_score of {name_score}: {score}.")
+        score = get_score(name_score, X_test, y_test, best_cv)
+        print(f"nested-test_score of {name_score}: {score}.")
+
+    return best_cv, best_params

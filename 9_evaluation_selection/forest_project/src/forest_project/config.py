@@ -14,7 +14,7 @@ from pathlib import Path
 class Config:
 
     def __init__(self) -> None:
-        self._PREPROCESS_SECTION = 'preprocess'
+        self._PREPROCESS = 'preprocess'
         self.cfg = configparser.ConfigParser()
         self.drop_feature = None
 
@@ -24,6 +24,6 @@ class Config:
 
     def get_drop_features(self) -> List[str]:
         if self._PREPROCESS_SECTION in self.cfg.sections():
-            drop_features = self.cfg[self._PREPROCESS_SECTION]['drop'].split('\n')
+            drop_features = self.cfg[self._PREPROCESS]['drop'].split('\n')
             return drop_features
-        raise Exception(f'[drop] list in [{self._PREPROCESS_SECTION}] section is not found in the file {self.path_}.')
+        raise Exception(f'{self._PREPROCESS} is not found in {self.path_}.')

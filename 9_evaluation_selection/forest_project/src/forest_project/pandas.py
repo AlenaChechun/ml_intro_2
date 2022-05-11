@@ -13,6 +13,7 @@ import mlflow.sklearn
 from .data import get_dataframe
 from .pandas_profile import run_pandas
 
+
 @click.command()
 @click.option(
     "-d",
@@ -21,16 +22,12 @@ from .pandas_profile import run_pandas
     type=click.Path(exists=True, dir_okay=False),
     show_default=True,
 )
-
 @click.option(
     "-out",
     "--output-path",
     default=Path("pandas_profiling.html"),
-    #type=click.Path(exists=True, dir_okay=False, path_type=Path),
     show_default=True,
 )
-
-
 def pandas(
     dataset_path: Path,
     output_path: Path

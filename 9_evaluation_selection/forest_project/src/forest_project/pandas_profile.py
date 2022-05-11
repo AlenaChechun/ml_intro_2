@@ -11,6 +11,6 @@ from pandas_profiling import ProfileReport
 
 def run_pandas(df: pd.DataFrame,
                result_path: Path,
-) -> None:
+               ) -> None:
     prof = ProfileReport(df)
     prof.to_file(result_path)

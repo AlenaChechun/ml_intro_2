@@ -11,19 +11,18 @@ import click
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 
+
 MODEL_LOGISTIC = 'LOGISTIC'
 MODEL_LOGISTIC_PARAMS = ['max_iter', 'C']
 MODEL_LOGISTIC_CV_PARAMS = [{'cl__max_iter': [100, 1000, 10000],
-                            'cl__C': [0.01, 0.01, 1, 10, 100]
-                          }]
+                            'cl__C': [0.01, 0.01, 1, 10, 100]}]
 
 MODEL_RFOREST = 'RFOREST'
 MODEL_RFOREST_PARAMS = ['n_estimators', 'max_depth', 'criterion']
-MODEL_RFOREST_CV_PARAMS = [{'cl__n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                           'cl__criterion': ['entropy', 'gini'],
-                           'cl__max_depth': list(range(10, 20))
-                         }]
-
+MODEL_RFOREST_CV_PARAMS = [{'cl__n_estimators':
+                            [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+                            'cl__criterion': ['entropy', 'gini'],
+                            'cl__max_depth': list(range(10, 20))}]
 
 
 class Model:
@@ -32,7 +31,7 @@ class Model:
                  name: str,
                  random_state: int,
                  **kwargs: float,
-    ) -> None:
+                 ) -> None:
         self.params = {}
         self.name = name
         if self.name == MODEL_LOGISTIC:
@@ -48,15 +47,22 @@ class Model:
             elif key in MODEL_LOGISTIC_PARAMS + MODEL_RFOREST_PARAMS:
                 print(f'unused param is {key}')
             else:
-              raise Exception(f"Unknown Model Parameter is '{key} for the model {self.name}")
+                raise Exception(f"Parameter is '{key} for {self.name}.")
         self.setup_model(random_state)
-
 
     def setup_model(self, random_state: int) -> None:
         if self.name == MODEL_LOGISTIC:
-            self.model = LogisticRegression(random_state=random_state, max_iter=self.params['max_iter'], C=self.params['C'])
+            self.model = LogisticRegression(
+                random_state=random_state,
+                max_iter=self.params['max_iter'],
+                C=self.params['C']
+                )
         elif self.name == MODEL_RFOREST:
-            self.model = RandomForestClassifier(random_state=random_state, n_estimators=self.params['n_estimators'], max_depth=self.params['max_depth'])
+            self.model = RandomForestClassifier(
+                random_state=random_state,
+                n_estimators=self.params['n_estimators'],
+                max_depth=self.params['max_depth']
+                )
         else:
             raise Exception(f"Unknown Model '{self.model}")
 
@@ -78,10 +84,12 @@ class Model:
                 if key.endswith(param):
                     self.params[param] = value
                     found_param = True
-                    click.echo(f"Update the model {self.name} : {param} = {value}.")
+                    msg = f"Update the model {self.name} : {param} = {value}."
+                    click.echo(msg)
                     break
             if found_param is False:
-                raise Exception(f"Unknown Model Param '{key}' is updating the model {self.name}")
+                msg = f"Model Param '{key}' is updating {self.name}"
+                raise Exception(msg)
         pass
 
     def mlflow_log_param(self, mlflow: mlflow) -> None:

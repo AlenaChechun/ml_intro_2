@@ -11,7 +11,6 @@ from joblib import dump
 import click
 import mlflow
 import mlflow.sklearn
-#import logging
 
 from .data import split_dataset, get_dataframe, get_features, get_target
 from .config import Config as config
@@ -141,25 +140,27 @@ from .model import Model, MODEL_LOGISTIC, MODEL_RFOREST
     type=int,
     show_default=True,
 )
-
-
 def train(
-    dataset_path: Path,
-    config_path: Path,
-    save_model_path: Path,
-    random_state: int,
-    test_split_ratio: float,
-    use_scaler: bool,
-    use_variance: bool, variance: int,
-    use_kbest: bool, k_best: int,
-    model: str,
-    max_iter: int, logreg_c: float,                     # params for logistic regression
-    n_estimators:int, max_depth: int, criterion: str,    # params for random
-    cv_kfolder: bool, cv_nested: bool, n_splits: int,
+        dataset_path: Path,
+        config_path: Path,
+        save_model_path: Path,
+        random_state: int,
+        test_split_ratio: float,
+        use_scaler: bool,
+        use_variance: bool, variance: int,
+        use_kbest: bool, k_best: int,
+        model: str,
+        # params for logistic regression
+        max_iter: int, logreg_c: float,
+        # params for random forest
+        n_estimators: int, max_depth: int, criterion: str,
+        cv_kfolder: bool, cv_nested: bool, n_splits: int,
 ) -> None:
     cfg = config()
     cfg.read_config(config_path)
-    scorings = ['accuracy', 'f1_weighted', 'roc_auc_ovr']   # todo: setup config, note: https://scikit-learn.org/stable/modules/model_evaluation.html
+    # todo: setup config,
+    # note: https://scikit-learn.org/stable/modules/model_evaluation.html
+    scorings = ['accuracy', 'f1_weighted', 'roc_auc_ovr']
     dataset = get_dataframe(dataset_path)
 
     dataset = preprocess(
@@ -170,12 +171,14 @@ def train(
     model_obj = Model(name=model,
                       random_state=random_state,
                       max_iter=max_iter, C=logreg_c,
-                      n_estimators=n_estimators, max_depth=max_depth, criterion=criterion
+                      n_estimators=n_estimators,
+                      max_depth=max_depth,
+                      criterion=criterion
                       )
 
     with mlflow.start_run():
         score_mean: List[float] = []
-        score_std: List[float]  = []
+        score_std: List[float] = []
 
         pipeline = create_pipeline(
             model_obj.get_model(),
@@ -184,7 +187,6 @@ def train(
             use_variance, variance,
             use_kbest, k_best,
         )
-
 
         if cv_nested:
             pipeline, best_params, score_mean = nested(
@@ -195,11 +197,9 @@ def train(
                 n_splits,
                 random_state,
                 scorings,
-                'accuracy',   #todo: setup config
+                'accuracy',   '''todo: setup config'''
             )
-
             model_obj.set_params(best_params)
-
         elif cv_kfolder:
             score_mean, score_std = kfolder(
                 pipeline,
@@ -217,12 +217,16 @@ def train(
             )
             pipeline.fit(X_train, y_train)
             for name_score in scorings:
-                score_mean.append(get_score(name_score, X_test, y_test, pipeline))
-
+                score_mean.append(
+                    get_score(
+                        name_score,
+                        X_test,
+                        y_test,
+                        pipeline)
+                    )
 
         model_obj.mlflow_log_param(mlflow)
-
-        mlflow.sklearn.log_model(pipeline, model)       # dump pickle module
+        mlflow.sklearn.log_model(pipeline, model)
         mlflow.log_param("random_state", random_state)
         mlflow.log_param("use_scaler", use_scaler)
         mlflow.log_param("use_variance", use_variance)
@@ -236,9 +240,10 @@ def train(
             mlflow.log_metric(name_score, score_mean[idx])
             if len(score_std) > idx:
                 mlflow.log_metric(name_score + 'std', score_std[idx])
-                click.echo(f"{name_score}: {score_mean[idx]} +/- {score_std[idx]}.")
+                msg = f"{name_score}: {score_mean[idx]} +/- {score_std[idx]}."
             else:
-                click.echo(f"{name_score}: {score_mean[idx]}.")
+                msg = f"{name_score}: {score_mean[idx]}."
+            click.echo(msg)
 
         dump(pipeline, save_model_path)
         click.echo(f"Model is saved to {save_model_path}.")

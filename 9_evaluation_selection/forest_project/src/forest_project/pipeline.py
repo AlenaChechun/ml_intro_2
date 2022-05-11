@@ -13,7 +13,7 @@ def create_pipeline(
     model_obj: object,
     random_state: int,
     use_scaler: bool,
-    use_variance: bool, variance : float,
+    use_variance: bool, variance: float,
     use_kbest: bool, k_best: int,
 ) -> Pipeline:
     pipeline_steps = []
@@ -26,7 +26,7 @@ def create_pipeline(
     if use_kbest:
         pipeline_steps.append(("select", SelectKBest(f_classif, k=k_best)))
     if use_variance and use_kbest:
-        raise Exception("Both feature selection approaches were selected. Please, use only one.")
+        raise Exception("Both feature selection approaches were selected.")
 
     '''SELECT CLASSIFIER'''
     pipeline_steps.append(

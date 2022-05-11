@@ -13,20 +13,24 @@ from sklearn.model_selection import train_test_split
 
 
 def get_dataframe(csv_path: Path
-) -> pd.DataFrame:
+                  ) -> pd.DataFrame:
     return pd.read_csv(csv_path)
 
-def get_features(dataset : pd.DataFrame,
-) -> pd.DataFrame:
+
+def get_features(dataset: pd.DataFrame,
+                 ) -> pd.DataFrame:
     return dataset.drop("Cover_Type", axis=1)
 
-def get_target(dataset : pd.DataFrame,
-) -> pd.Series:
+
+def get_target(dataset: pd.DataFrame,
+               ) -> pd.Series:
     return dataset["Cover_Type"]
 
-def split_dataset(
-    dataset : pd.DataFrame, random_state: int, test_split_ratio: float
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+
+def split_dataset(dataset: pd.DataFrame,
+                  random_state: int,
+                  test_split_ratio: float
+                  ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     click.echo(f"Dataset shape: {dataset.shape}.")
     features = get_features(dataset)
     target = get_target(dataset)
@@ -35,8 +39,10 @@ def split_dataset(
     )
     return X_train, X_test, y_train, y_test
 
-def get_dataset(
-    csv_path: Path, random_state: int, test_split_ratio: float
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+
+def get_dataset(csv_path: Path,
+                random_state: int,
+                test_split_ratio: float
+                ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     dataset = pd.read_csv(csv_path)
     return split_dataset(dataset, random_state, test_split_ratio)

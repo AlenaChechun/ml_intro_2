@@ -52,7 +52,6 @@ def nested(model: Pipeline,
         y_train = y.iloc[train_index.tolist()]
         X_test = X.iloc[test_index.tolist()]
         y_test = y.iloc[test_index.tolist()]
-        click.echo(f'Splited train dataset: {X_train.shape}, {X_test.shape}')
         cv_inner = KFold(n_splits=(n_splits - 1),
                          shuffle=True,
                          random_state=random_state

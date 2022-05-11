@@ -23,7 +23,7 @@ class Config:
         self.cfg.read(path)
 
     def get_drop_features(self) -> List[str]:
-        if self._PREPROCESS_SECTION in self.cfg.sections():
+        if self._PREPROCESS in self.cfg.sections():
             drop_features = self.cfg[self._PREPROCESS]['drop'].split('\n')
             return drop_features
         raise Exception(f'{self._PREPROCESS} is not found in {self.path_}.')

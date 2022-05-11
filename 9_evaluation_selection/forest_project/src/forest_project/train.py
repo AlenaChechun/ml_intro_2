@@ -197,7 +197,7 @@ def train(
                 n_splits,
                 random_state,
                 scorings,
-                'accuracy',   '''todo: setup config'''
+                'accuracy'
             )
             model_obj.set_params(best_params)
         elif cv_kfolder:

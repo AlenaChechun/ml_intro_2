@@ -94,6 +94,22 @@ git checkout 2022
 
 Assignment results
 -------------------
-#. MYPY result for 13.
+#. [8] Track each experiment into MLFlow.
 
-.. image:: 13_mypy.JPG
+.. image:: img\8_mlflow.JPG
+
+#. [12] Provide a screenshot that flake8 linting and formatting are passed.
+
+.. image:: img\12_flake8.JPG
+
+#. [13] MYPY result.
+
+.. image:: img\13_mypy.JPG
+
+#. [14] nox using.
+
+.. image:: img\nox.JPG
+
+#. Example of poetry env remove
+
+.. image:: img\remove_env.JPG

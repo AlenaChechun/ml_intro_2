@@ -37,7 +37,7 @@ def test_error_for_invalid_test_split_ratio(
     )
     assert result.exit_code == 2
     assert "Invalid value for '--test-split-ratio'" in result.output
-    
+
 def test_model(
     runner: CliRunner
 ) -> None:
@@ -50,7 +50,7 @@ def test_model(
         ],
     )
     assert result.exit_code == 0
-    
+
 def test_error_for_model(
         runner: CliRunner
     ) -> None:

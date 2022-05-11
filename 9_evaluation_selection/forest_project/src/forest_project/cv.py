@@ -38,15 +38,16 @@ def nested(model: Pipeline,
            random_state: int,
            name_scorings: List[str],
            name_fit_core: str,
-) -> Tuple[object, Dict[str, object]]:
+) -> Tuple[object, Dict[str, object], List[float]]:
     cv_out = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
     best_score = 0
     best_cv = None
+    best_score_list: List[float] = []
     for train_index, test_index in cv_out.split(X):
         X_train, X_test = X.iloc[train_index.tolist()], X.iloc[test_index.tolist()]
         y_train, y_test = y.iloc[train_index.tolist()], y.iloc[test_index.tolist()]
-        click.echo(X_train.shape, X_test.shape)
+        click.echo(f'Splited train dataset: {X_train.shape}, {X_test.shape}')
         cv_inner = KFold(n_splits=(n_splits - 1), shuffle=True, random_state=random_state)
         cv = RandomizedSearchCV(model,
                           model_params,
@@ -61,16 +62,18 @@ def nested(model: Pipeline,
         # print(cv.cv_results_)
 
         if cv.best_score_ > best_score:
+            best_score_list = []
             best_score = cv.best_score_
             best_cv = cv
             best_params = cv.best_params_
             click.echo(f"nested-best_params_: {cv.best_params_}")
             click.echo(f"nested-train_score of {name_fit_core}: {cv.best_score_}")
 
-    for name_score, idx in zip(name_scorings, range(len(name_scorings))):
-        score = get_score(name_score, X_train, y_train, best_cv)
-        click.echo(f"nested-train_score of {name_score}: {score}.")
-        score = get_score(name_score, X_test, y_test, best_cv)
-        click.echo(f"nested-test_score of {name_score}: {score}.")
+            for name_score, idx in zip(name_scorings, range(len(name_scorings))):
+                score = get_score(name_score, X_train, y_train, best_cv)
+                click.echo(f"nested-train_score of {name_score}: {score}.")
+                score = get_score(name_score, X_test, y_test, best_cv)
+                best_score_list.append(score)
+                click.echo(f"nested-test_score of {name_score}: {score}.")
 
-    return best_cv, best_params
+    return best_cv, best_params, best_score_list

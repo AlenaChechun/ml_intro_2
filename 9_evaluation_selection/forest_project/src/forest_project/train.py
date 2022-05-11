@@ -118,6 +118,12 @@ from .model import Model, MODEL_LOGISTIC, MODEL_RFOREST
     help='[default: None]'
 )
 @click.option(
+    "--criterion",
+    default='entropy',
+    type=click.Choice(['entropy', 'gini'], case_sensitive=False),
+    show_default=True,
+)
+@click.option(
     "--cv-kfolder",
     default=True,
     type=bool,
@@ -147,8 +153,8 @@ def train(
     use_variance: bool, variance: int,
     use_kbest: bool, k_best: int,
     model: str,
-    max_iter: int, logreg_c: float,    # params for logistic regression
-    n_estimators:int, max_depth: int,  # params for random
+    max_iter: int, logreg_c: float,                     # params for logistic regression
+    n_estimators:int, max_depth: int, criterion: str,    # params for random
     cv_kfolder: bool, cv_nested: bool, n_splits: int,
 ) -> None:
     cfg = config()
@@ -164,7 +170,7 @@ def train(
     model_obj = Model(name=model,
                       random_state=random_state,
                       max_iter=max_iter, C=logreg_c,
-                      n_estimators=n_estimators, max_depth=max_depth,
+                      n_estimators=n_estimators, max_depth=max_depth, criterion=criterion
                       )
 
     with mlflow.start_run():
@@ -181,7 +187,7 @@ def train(
 
 
         if cv_nested:
-            pipeline, best_params = nested(
+            pipeline, best_params, score_mean = nested(
                 pipeline,
                 model_obj.get_cv_params(),
                 get_features(dataset),
@@ -210,12 +216,8 @@ def train(
                 test_split_ratio,
             )
             pipeline.fit(X_train, y_train)
-
-        # update scores
-        if len(score_mean) == 0:
             for name_score in scorings:
                 score_mean.append(get_score(name_score, X_test, y_test, pipeline))
-                score_std.append(0)
 
 
         model_obj.mlflow_log_param(mlflow)
@@ -232,8 +234,11 @@ def train(
 
         for name_score, idx in zip(scorings, range(len(scorings))):
             mlflow.log_metric(name_score, score_mean[idx])
-            mlflow.log_metric(name_score + 'std', score_std[idx])
-            click.echo(f"{name_score}: {score_mean[idx]} +/- {score_std[idx]}.")
+            if len(score_std) > idx:
+                mlflow.log_metric(name_score + 'std', score_std[idx])
+                click.echo(f"{name_score}: {score_mean[idx]} +/- {score_std[idx]}.")
+            else:
+                click.echo(f"{name_score}: {score_mean[idx]}.")
 
         dump(pipeline, save_model_path)
         click.echo(f"Model is saved to {save_model_path}.")

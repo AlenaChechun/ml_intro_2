@@ -91,3 +91,9 @@ git clone git@github.com:AlenaChechun/ml_intro_2.git
 ```
 git checkout 2022
 ```
+
+Assignment results
+-------------------
+#. MYPY result for 13.
+
+.. image:: 13_mypy.JPG

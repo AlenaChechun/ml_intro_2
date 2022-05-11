@@ -92,6 +92,10 @@ git clone git@github.com:AlenaChechun/ml_intro_2.git
 git checkout 2022
 ```
 
+*  To combine steps of testing and linting into a single command, run NOX.
+
+``nox``
+
 Assignment results
 -------------------
 * [8] Track each experiment into MLFlow.

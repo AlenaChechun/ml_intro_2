@@ -1,8 +1,8 @@
 import pytest
 
 from click.testing import CliRunner
-from forest_project.train import train
-from forest_project.model import MODEL_RFOREST
+from src.forest_project.model import MODEL_RFOREST
+from src.forest_project.train import train
 
 
 @pytest.fixture

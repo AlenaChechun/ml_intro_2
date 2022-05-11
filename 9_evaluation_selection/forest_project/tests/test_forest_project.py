@@ -1,4 +1,4 @@
-from forest_project import __version__
+from src.forest_project import __version__
 
 
 def test_version():
